@@ -17,13 +17,64 @@
  */
 
 #include <stdint.h>
+#include "stm32f4xx_hal.h"
 
 #if !defined(__SOFT_FP__) && defined(__ARM_FP)
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
+void LED_Init();
+void Button_Init();
+/* BTN = PC13, BUS = AHB1EN bit0 */
+/* LED = PA5,  BUS = AHB1EN bit2 */
+#define BTN_PORT GPIOC
+#define BTN_PIN GPIO_PIN_13
 
+#define LED_PORT GPIOA
+#define LED_PIN GPIO_PIN_5
+
+uint8_t button_state = 0;
 int main(void)
 {
-    /* Loop forever */
-	for(;;);
+  HAL_Init();
+  LED_Init();
+  Button_Init();
+  /* Loop forever */
+	while(1)
+  {
+    button_state = HAL_GPIO_ReadPin (BTN_PORT, BTN_PIN);
+    HAL_GPIO_WritePin(LED_PORT, LED_PIN, button_state);
+  }
+}
+
+void LED_Init()
+{
+  /* 1. Configure PA5 as output pin */
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    GPIO_InitStruct.Pin = GPIO_PIN_5;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL; 
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct); 
+}
+
+void Button_Init()
+{
+  /* 2. Configure PC13 as input pin */
+    __HAL_RCC_GPIOC_CLK_ENABLE();
+
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    GPIO_InitStruct.Pin = GPIO_PIN_13;
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Pull = GPIO_NOPULL; 
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct); 
+}
+
+void SysTick_Handler()
+{
+  HAL_IncTick();
 }
