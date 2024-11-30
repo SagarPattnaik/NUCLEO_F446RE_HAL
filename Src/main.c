@@ -17,7 +17,8 @@
  */
 
 #include <stdint.h>
-#include<string.h>
+#include <string.h>
+#include <stdio.h>
 #include "stm32f4xx_hal.h"
 
 #if !defined(__SOFT_FP__) && defined(__ARM_FP)
@@ -41,6 +42,12 @@ uint16_t len_of_data = 0;
 /* Peripheral Initializations */
 UART_HandleTypeDef huart2;
 
+int __io_putchar(int ch)
+{
+	HAL_UART_Transmit(&huart2,(uint8_t*)&ch,1,10);
+	return ch;
+}
+
 int main(void)
 {
   HAL_Init();
@@ -53,7 +60,7 @@ int main(void)
   {
     button_state = HAL_GPIO_ReadPin (BTN_PORT, BTN_PIN);
     HAL_GPIO_WritePin(LED_PORT, LED_PIN, button_state);
-    HAL_UART_Transmit(&huart2,(uint8_t*)user_data,len_of_data,100);
+    printf("Printf is being used ! \r\n");
     HAL_Delay(10);
   }
 }
