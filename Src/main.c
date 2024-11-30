@@ -17,6 +17,7 @@
  */
 
 #include <stdint.h>
+#include<string.h>
 #include "stm32f4xx_hal.h"
 
 #if !defined(__SOFT_FP__) && defined(__ARM_FP)
@@ -24,6 +25,8 @@
 #endif
 void LED_Init();
 void Button_Init();
+void Usart2_Init();
+void Error_handler(void);
 /* BTN = PC13, BUS = AHB1EN bit0 */
 /* LED = PA5,  BUS = AHB1EN bit2 */
 #define BTN_PORT GPIOC
@@ -33,16 +36,25 @@ void Button_Init();
 #define LED_PIN GPIO_PIN_5
 
 uint8_t button_state = 0;
+char *user_data = "The HAL application is running\r\n";
+uint16_t len_of_data = 0;
+/* Peripheral Initializations */
+UART_HandleTypeDef huart2;
+
 int main(void)
 {
   HAL_Init();
   LED_Init();
   Button_Init();
+  Usart2_Init();
+  len_of_data = strlen(user_data);
   /* Loop forever */
 	while(1)
   {
     button_state = HAL_GPIO_ReadPin (BTN_PORT, BTN_PIN);
     HAL_GPIO_WritePin(LED_PORT, LED_PIN, button_state);
+    HAL_UART_Transmit(&huart2,(uint8_t*)user_data,len_of_data,100);
+    HAL_Delay(10);
   }
 }
 
@@ -77,4 +89,39 @@ void Button_Init()
 void SysTick_Handler()
 {
   HAL_IncTick();
+}
+
+void Error_handler(void)
+{
+	while(1);
+}
+
+void Usart2_Init()
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+  /* Use PA2 for USART2_Tx and PA3 for USART2_Rx */
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  /* Enable USART module */
+  __HAL_RCC_USART2_CLK_ENABLE();
+  /* Configure GPIO pins for USART2 alternate functionality AF7 */
+  GPIO_InitStruct.Pin = GPIO_PIN_2|GPIO_PIN_3;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  HAL_GPIO_Init(GPIOA,&GPIO_InitStruct);
+  
+  /* USART2 Initialization */
+	huart2.Instance = USART2;
+	huart2.Init.BaudRate = 115200;
+	huart2.Init.WordLength = UART_WORDLENGTH_8B;
+	huart2.Init.StopBits = UART_STOPBITS_1;
+	huart2.Init.Parity = UART_PARITY_NONE;
+	huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+	huart2.Init.Mode = UART_MODE_TX_RX;
+	if ( HAL_UART_Init(&huart2) != HAL_OK )
+	{
+		//There is a problem
+		Error_handler();
+	}
 }
