@@ -7,6 +7,7 @@
 
 #ifndef GPIO_H_
 #define GPIO_H_
+#include "stm32f4xx_hal.h"
 
 void LED_Init();
 void Button_Init();
@@ -16,8 +17,5 @@ void Button_Init();
 
 #define LED_PORT GPIOA
 #define LED_PIN GPIO_PIN_5
-
-uint8_t button_state = 0;
-
 
 #endif /* GPIO_H_ */

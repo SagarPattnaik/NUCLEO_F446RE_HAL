@@ -27,6 +27,8 @@
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
 
+uint8_t button_state = 0;
+
 int main(void)
 {
   HAL_Init();

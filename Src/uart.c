@@ -5,7 +5,7 @@
  *      Author: LENOVO
  */
 
-#include "stm32f4xx_hal.h"
+#include "uart.h"
 
 /* Peripheral Initializations */
 UART_HandleTypeDef huart2;
