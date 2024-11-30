@@ -20,41 +20,20 @@
 #include <string.h>
 #include <stdio.h>
 #include "stm32f4xx_hal.h"
+#include "uart.h"
+#include "gpio.h"
 
 #if !defined(__SOFT_FP__) && defined(__ARM_FP)
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
-void LED_Init();
-void Button_Init();
-void Usart2_Init();
-void Error_handler(void);
-/* BTN = PC13, BUS = AHB1EN bit0 */
-/* LED = PA5,  BUS = AHB1EN bit2 */
-#define BTN_PORT GPIOC
-#define BTN_PIN GPIO_PIN_13
-
-#define LED_PORT GPIOA
-#define LED_PIN GPIO_PIN_5
-
-uint8_t button_state = 0;
-char *user_data = "The HAL application is running\r\n";
-uint16_t len_of_data = 0;
-/* Peripheral Initializations */
-UART_HandleTypeDef huart2;
-
-int __io_putchar(int ch)
-{
-	HAL_UART_Transmit(&huart2,(uint8_t*)&ch,1,10);
-	return ch;
-}
 
 int main(void)
 {
   HAL_Init();
   LED_Init();
   Button_Init();
-  Usart2_Init();
-  len_of_data = strlen(user_data);
+  USART2_Init();
+
   /* Loop forever */
 	while(1)
   {
@@ -65,70 +44,7 @@ int main(void)
   }
 }
 
-void LED_Init()
-{
-  /* 1. Configure PA5 as output pin */
-    __HAL_RCC_GPIOA_CLK_ENABLE();
-
-    GPIO_InitTypeDef GPIO_InitStruct = {0};
-    GPIO_InitStruct.Pin = GPIO_PIN_5;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL; 
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct); 
-}
-
-void Button_Init()
-{
-  /* 2. Configure PC13 as input pin */
-    __HAL_RCC_GPIOC_CLK_ENABLE();
-
-    GPIO_InitTypeDef GPIO_InitStruct = {0};
-    GPIO_InitStruct.Pin = GPIO_PIN_13;
-    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-    GPIO_InitStruct.Pull = GPIO_NOPULL; 
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-
-    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct); 
-}
-
 void SysTick_Handler()
 {
   HAL_IncTick();
-}
-
-void Error_handler(void)
-{
-	while(1);
-}
-
-void Usart2_Init()
-{
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
-  /* Use PA2 for USART2_Tx and PA3 for USART2_Rx */
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-  /* Enable USART module */
-  __HAL_RCC_USART2_CLK_ENABLE();
-  /* Configure GPIO pins for USART2 alternate functionality AF7 */
-  GPIO_InitStruct.Pin = GPIO_PIN_2|GPIO_PIN_3;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-  HAL_GPIO_Init(GPIOA,&GPIO_InitStruct);
-  
-  /* USART2 Initialization */
-	huart2.Instance = USART2;
-	huart2.Init.BaudRate = 115200;
-	huart2.Init.WordLength = UART_WORDLENGTH_8B;
-	huart2.Init.StopBits = UART_STOPBITS_1;
-	huart2.Init.Parity = UART_PARITY_NONE;
-	huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-	huart2.Init.Mode = UART_MODE_TX_RX;
-	if ( HAL_UART_Init(&huart2) != HAL_OK )
-	{
-		//There is a problem
-		Error_handler();
-	}
 }
