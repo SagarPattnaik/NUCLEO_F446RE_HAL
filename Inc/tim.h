@@ -7,6 +7,7 @@
 
 #ifndef TIM_H_
 #define TIM_H_
+
 #include "stm32f4xx_hal.h"
 
 #define TIMx					TIM3

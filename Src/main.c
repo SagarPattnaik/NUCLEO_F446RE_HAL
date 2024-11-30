@@ -22,28 +22,34 @@
 #include "stm32f4xx_hal.h"
 #include "uart.h"
 #include "gpio.h"
+#include "tim.h"
 
-#if !defined(__SOFT_FP__) && defined(__ARM_FP)
-  #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
-#endif
 
 uint8_t button_state = 0;
 
 int main(void)
 {
   HAL_Init();
-  LED_Init();
-  Button_Init();
+  /* LED_Init();
+  Button_Init(); */
+  tim_timebase_init();
   USART2_Init();
 
   /* Loop forever */
 	while(1)
   {
-    button_state = HAL_GPIO_ReadPin (BTN_PORT, BTN_PIN);
+    /* button_state = HAL_GPIO_ReadPin (BTN_PORT, BTN_PIN);
     HAL_GPIO_WritePin(LED_PORT, LED_PIN, button_state);
     printf("Printf is being used ! \r\n");
-    HAL_Delay(10);
+    HAL_Delay(10); */
   }
+}
+
+void HAL_TIM_PeriodElapsedCallback( TIM_HandleTypeDef *htim)
+{
+	//Do somthing
+	printf("A second just elapsed ! \n\r");
+
 }
 
 void SysTick_Handler()
