@@ -31,15 +31,17 @@ int main(void)
 {
   HAL_Init();
   USART2_Init();
-  /* 1. Setup ADC for continuos conversion */
-  adc_continous_conv_init();
-  /* 2. Start ADC */
-  adc_start();
+  /* 1. Setup ADC for Single conversion */
+  adc_single_conv_init();
   
   /* Loop forever */
 	while(1)
   {
-	  //3. Get conversion
+    /* 2. Start ADC */
+    adc_start();
+	  //3. Poll for conversion
+	   HAL_ADC_PollForConversion(&hadc1,1);
+	  //4. Get conversion
 	  sensor_value =  adc_read();
 	  printf("The sensor value : %d   \n\r",(int)sensor_value);
     HAL_Delay(10);
