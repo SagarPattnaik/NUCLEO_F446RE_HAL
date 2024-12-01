@@ -21,35 +21,29 @@
 #include <stdio.h>
 #include "stm32f4xx_hal.h"
 #include "uart.h"
-#include "gpio.h"
-#include "tim.h"
+#include "adc.h"
 
-
-uint8_t button_state = 0;
+/* Peripheral Initialization */
+ADC_HandleTypeDef hadc1;
+uint32_t  sensor_value;
 
 int main(void)
 {
   HAL_Init();
-  /* LED_Init();
-  Button_Init(); */
-  tim_timebase_init();
   USART2_Init();
-
+  /* 1. Setup ADC for continuos conversion */
+  adc_continous_conv_init();
+  /* 2. Start ADC */
+  adc_start();
+  
   /* Loop forever */
 	while(1)
   {
-    /* button_state = HAL_GPIO_ReadPin (BTN_PORT, BTN_PIN);
-    HAL_GPIO_WritePin(LED_PORT, LED_PIN, button_state);
-    printf("Printf is being used ! \r\n");
-    HAL_Delay(10); */
+	  //3. Get conversion
+	  sensor_value =  adc_read();
+	  printf("The sensor value : %d   \n\r",(int)sensor_value);
+    HAL_Delay(10);
   }
-}
-
-void HAL_TIM_PeriodElapsedCallback( TIM_HandleTypeDef *htim)
-{
-	//Do somthing
-	printf("A second just elapsed ! \n\r");
-
 }
 
 void SysTick_Handler()
