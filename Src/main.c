@@ -28,6 +28,7 @@ int main(void)
   HAL_Init();
   LED_Init();
   Button_Init();
+  PA0_Init();
   USART2_Init();
   
   /* Loop forever */
@@ -47,6 +48,15 @@ void SysTick_Handler()
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	//Do something..
-	HAL_GPIO_TogglePin(LED_PORT,LED_PIN);
-	printf("Button pressed ! \n\r");
+
+	if(GPIO_Pin == GPIO_PIN_13)
+  {
+	  HAL_GPIO_TogglePin(LED_PORT,LED_PIN);
+	  printf("Button 13 pressed ! \n\r");
+	}
+
+	if(GPIO_Pin == GPIO_PIN_0)
+  {
+	  printf("PA0 is connected to 3.3V using jumper wire! \n\r");
+	}
 }

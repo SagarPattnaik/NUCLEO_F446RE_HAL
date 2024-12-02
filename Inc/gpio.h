@@ -11,6 +11,7 @@
 
 void LED_Init();
 void Button_Init();
+void PA0_Init();
 
 #define BTN_PORT GPIOC
 #define BTN_PIN GPIO_PIN_13

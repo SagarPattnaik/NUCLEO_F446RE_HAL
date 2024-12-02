@@ -23,6 +23,21 @@ void LED_Init()
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct); 
 }
 
+void PA0_Init()
+{
+  /* 1. Configure PA0 as Interrupt */
+
+	GPIO_InitStruct.Pin  = GPIO_PIN_0;
+	GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct); 
+
+  HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+}
+
 void Button_Init()
 {
   /* 2. Configure PC13 as input pin */
@@ -43,6 +58,12 @@ void Button_Init()
 void EXTI15_10_IRQHandler(void){
 
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_13);
+
+}
+
+void EXTI0_IRQHandler(void){
+
+	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
 
 }
 
