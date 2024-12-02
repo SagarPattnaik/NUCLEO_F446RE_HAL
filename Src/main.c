@@ -21,29 +21,19 @@
 #include <stdio.h>
 #include "stm32f4xx_hal.h"
 #include "uart.h"
-#include "adc.h"
-
-/* Peripheral Initialization */
-ADC_HandleTypeDef hadc1;
-uint32_t  sensor_value;
+#include "gpio.h"
 
 int main(void)
 {
   HAL_Init();
+  LED_Init();
+  Button_Init();
   USART2_Init();
-  /* 1. Setup ADC for Single conversion */
-  adc_single_conv_init();
   
   /* Loop forever */
 	while(1)
   {
-    /* 2. Start ADC */
-    adc_start();
-	  //3. Poll for conversion
-	   HAL_ADC_PollForConversion(&hadc1,1);
-	  //4. Get conversion
-	  sensor_value =  adc_read();
-	  printf("The sensor value : %d   \n\r",(int)sensor_value);
+
     HAL_Delay(10);
   }
 }
@@ -51,4 +41,12 @@ int main(void)
 void SysTick_Handler()
 {
   HAL_IncTick();
+}
+
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	//Do something..
+	HAL_GPIO_TogglePin(LED_PORT,LED_PIN);
+	printf("Button pressed ! \n\r");
 }

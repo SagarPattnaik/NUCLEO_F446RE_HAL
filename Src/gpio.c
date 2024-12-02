@@ -29,9 +29,20 @@ void Button_Init()
     __HAL_RCC_GPIOC_CLK_ENABLE();
 
     GPIO_InitStruct.Pin = GPIO_PIN_13;
-    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
     GPIO_InitStruct.Pull = GPIO_NOPULL; 
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 
     HAL_GPIO_Init(GPIOC, &GPIO_InitStruct); 
+
+    //Configure EXTI
+    HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 }
+
+void EXTI15_10_IRQHandler(void){
+
+	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_13);
+
+}
+
