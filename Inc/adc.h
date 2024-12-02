@@ -15,4 +15,5 @@ extern uint32_t adc_read(void);
 extern void adc_start(void);
 extern void adc_continous_conv_init(void);
 extern void adc_single_conv_init(void);
+extern void adc_interrupt_init(void);
 #endif /* ADC_H_ */

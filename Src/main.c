@@ -21,21 +21,21 @@
 #include <stdio.h>
 #include "stm32f4xx_hal.h"
 #include "uart.h"
-#include "gpio.h"
+#include "adc.h"
+
+ADC_HandleTypeDef hadc1;
+uint32_t  sensor_value;
 
 int main(void)
 {
   HAL_Init();
-  LED_Init();
-  Button_Init();
-  PA0_Init();
+  adc_interrupt_init();
   USART2_Init();
-  
+  HAL_ADC_Start_IT(&hadc1);
   /* Loop forever */
 	while(1)
   {
-
-    HAL_Delay(10);
+    printf("The sensor value : %d   \n\r",(int)sensor_value);
   }
 }
 
@@ -44,19 +44,8 @@ void SysTick_Handler()
   HAL_IncTick();
 }
 
-
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
-	//Do something..
-
-	if(GPIO_Pin == GPIO_PIN_13)
-  {
-	  HAL_GPIO_TogglePin(LED_PORT,LED_PIN);
-	  printf("Button 13 pressed ! \n\r");
-	}
-
-	if(GPIO_Pin == GPIO_PIN_0)
-  {
-	  printf("PA0 is connected to 3.3V using jumper wire! \n\r");
-	}
+	//do something
+	sensor_value =  adc_read();
 }
