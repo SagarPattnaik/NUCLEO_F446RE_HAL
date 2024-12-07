@@ -24,28 +24,39 @@
 #include "adc.h"
 
 ADC_HandleTypeDef hadc1;
+DMA_HandleTypeDef hdma_adc1;
 uint32_t  sensor_value;
+uint32_t  value;
+void WWDG_Disable(void);
+
+void WWDG_Disable(void)
+{
+    // Disable the WWDG clock (optional, depending on your application)
+    __HAL_RCC_WWDG_CLK_DISABLE();
+
+    // Disable the WWDG by clearing the control register (CCR)
+    // Writing 0 to the control register will disable the WWDG
+    WWDG->CR &= ~WWDG_CR_WDGA; // Disable the watchdog
+}
 
 int main(void)
 {
   HAL_Init();
-  adc_interrupt_init();
+  //WWDG_Disable();
   USART2_Init();
-  HAL_ADC_Start_IT(&hadc1);
+  adc_dma_init();
+  HAL_ADC_Start_DMA(&hadc1,&sensor_value,1);
+
   /* Loop forever */
 	while(1)
   {
-    printf("The sensor value : %d   \n\r",(int)sensor_value);
+	  printf("The sensor value : %d   \n\r",sensor_value);
+    HAL_Delay(100);
+
   }
 }
 
 void SysTick_Handler()
 {
   HAL_IncTick();
-}
-
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
-{
-	//do something
-	sensor_value =  adc_read();
 }
