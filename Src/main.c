@@ -25,34 +25,22 @@
 
 ADC_HandleTypeDef hadc1;
 DMA_HandleTypeDef hdma_adc1;
-uint32_t  sensor_value;
-uint32_t  value;
-void WWDG_Disable(void);
+uint32_t  sensor_value[2];
 
-void WWDG_Disable(void)
-{
-    // Disable the WWDG clock (optional, depending on your application)
-    __HAL_RCC_WWDG_CLK_DISABLE();
-
-    // Disable the WWDG by clearing the control register (CCR)
-    // Writing 0 to the control register will disable the WWDG
-    WWDG->CR &= ~WWDG_CR_WDGA; // Disable the watchdog
-}
-
-int main(void)
+int main()
 {
   HAL_Init();
   //WWDG_Disable();
   USART2_Init();
-  adc_dma_init();
-  HAL_ADC_Start_DMA(&hadc1,&sensor_value,1);
+  adc_multichannel_dma_init();
+  HAL_ADC_Start_DMA(&hadc1,(uint32_t *)sensor_value,2);
 
   /* Loop forever */
 	while(1)
   {
-	  printf("The sensor value : %d   \n\r",sensor_value);
+	  printf("Sensor 1 data :  %d \n\r",(int)sensor_value[0]);
+	  printf("Sensor 2 data :  %d \n\r",(int)sensor_value[1]);
     HAL_Delay(100);
-
   }
 }
 

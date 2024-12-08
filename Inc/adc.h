@@ -17,5 +17,6 @@ extern void adc_continous_conv_init(void);
 extern void adc_single_conv_init(void);
 extern void adc_interrupt_init(void);
 extern void adc_dma_init(void);
+extern void adc_multichannel_dma_init(void);
 
 #endif /* ADC_H_ */
